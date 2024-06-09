@@ -3,12 +3,23 @@
 import sys
 import time
 import blessed
+import re
 from functools import partial
 
 echo = partial(print, end="", flush=True)
 term = blessed.Terminal()
 
-total_seconds = int(sys.argv[1])
+total_seconds = 0
+a = re.split(":|\\.", sys.argv[1])
+
+match len(a):
+    case 1:
+        total_seconds = int(a[0]) * 60
+    case 2:
+        total_seconds = int(a[0]) * 60 + int(a[1])
+    case 3:
+        total_seconds = int(a[0]) * 60*60 + int(a[1]) * 60 + int(a[2])
+
 
 with term.cbreak():
     for seconds_left in range(total_seconds, 0, -1):
