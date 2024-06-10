@@ -9,17 +9,35 @@ from functools import partial
 echo = partial(print, end="", flush=True)
 term = blessed.Terminal()
 
-total_seconds = 0
-a = re.split(":|\\.", sys.argv[1])
+def parse_input_to_seconds():
+    # todo: handle missing args
+    input = sys.argv[1]
 
-match len(a):
-    case 1:
-        total_seconds = int(a[0]) * 60
-    case 2:
-        total_seconds = int(a[0]) * 60 + int(a[1])
-    case 3:
-        total_seconds = int(a[0]) * 60*60 + int(a[1]) * 60 + int(a[2])
+    # h:mm:ss
+    match = re.match("^(1?[0-9]|2[0-4])[:.]([0-5][0-9])[:.]([0-5][0-9])$", input)
+    if match:
+        h, m, s = match.groups()
+        return int(h)*60*60 + int(m)*60 + int(s)
 
+    # m:ss
+    match = re.match("^([0-5]?[0-9])[:.]([0-5][0-9])$", input)
+    if match:
+        m, s = match.groups()
+        return int(m)*60 + int(s)
+
+    # m
+    match = re.match("^(60|[1-5]?[0-9])$", input)
+    if match:
+        m = match.group(1)
+        return int(m) * 60
+
+    # todo: accept format like "1h30m30s", "1h", "5s" ...
+
+    # todo: handle invalid args
+    return -1
+
+
+total_seconds = parse_input_to_seconds()
 
 with term.cbreak():
     for seconds_left in range(total_seconds, 0, -1):
